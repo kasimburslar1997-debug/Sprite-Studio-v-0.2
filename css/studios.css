@@ -217,7 +217,7 @@
 }
 
 /* =======================================================
-   5. استوديو إعادة التسمية (دعم كامل وأنيق للوضع الليلي)
+   استوديو إعادة التسمية (دعم نقي ومتكامل للوضع الليلي)
    ======================================================= */
 .rename-workspace {
     width: 100%;
@@ -231,7 +231,6 @@
     padding: 16px;
     cursor: default;
     background-color: var(--canvas-card-bg);
-    /* متوافق تلقائياً مع الوضعين */
     border: 1px solid var(--slider-track);
 }
 
@@ -246,61 +245,6 @@
     background-color: transparent;
 }
 
-.rename-top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--card-bg);
-    padding: 8px 18px;
-    border-radius: var(--radius-pill);
-    box-shadow: var(--shadow-button);
-    flex-shrink: 0;
-    border: 1px solid var(--slider-track);
-}
-
-.rename-top-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.rename-header-btn {
-    padding: 6px 14px;
-    font-size: 13px;
-    border-radius: var(--radius-pill);
-    background: var(--bg-color);
-    color: var(--text-main);
-}
-
-.rename-header-btn:hover {
-    background: var(--upload-bg);
-    color: var(--accent-red);
-}
-
-.rename-cancel-btn {
-    color: #DC3545;
-}
-
-.rename-status-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.rename-badge-pill {
-    font-size: 12px;
-    font-weight: 700;
-    background: var(--bg-color);
-    color: var(--text-main);
-    padding: 6px 14px;
-    border-radius: var(--radius-pill);
-}
-
-.highlight-badge {
-    background: var(--upload-bg);
-    color: var(--accent-red);
-}
-
 .rename-grid-scroll {
     flex: 1;
     width: 100%;
@@ -308,17 +252,7 @@
     overflow-x: hidden;
     padding: 6px 8px 16px 8px;
     touch-action: pan-y;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 59, 92, 0.3) transparent;
-}
-
-.rename-grid-scroll::-webkit-scrollbar {
-    width: 7px;
-}
-
-.rename-grid-scroll::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 59, 92, 0.3);
-    border-radius: 12px;
+    background-color: transparent;
 }
 
 .rename-grid {
@@ -339,7 +273,7 @@
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease;
     border: 1.5px solid var(--slider-track);
     touch-action: none;
 }
@@ -354,38 +288,19 @@
     background: var(--upload-bg);
 }
 
-.rename-checkbox-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--card-bg);
-    color: var(--text-muted);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
-    transition: all 0.2s ease;
-    z-index: 2;
-}
-
-.rename-grid-card.selected .rename-checkbox-badge {
-    background: var(--accent-red);
-    color: #FFFFFF;
-}
-
-.rename-checkbox-badge .material-symbols-rounded {
-    font-size: 16px;
-}
-
 .rename-card-thumb {
     width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 10px;
     overflow: hidden;
-    background: var(--bg-color);
+    /* خلفية شبكية شفافة للمعاينة تناسب كل الصور والأيقونات الشفافة في الوضعين */
+    background-color: var(--bg-color);
+    background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.04) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(0, 0, 0, 0.04) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.04) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.04) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
     display: flex;
     align-items: center;
     justify-content: center;
