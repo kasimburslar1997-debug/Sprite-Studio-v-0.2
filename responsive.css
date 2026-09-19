@@ -1,0 +1,43 @@
+/**
+ * Media & Sprite Studio - Responsive Styles (Mobile & Tablets)
+ */
+
+@media (max-width: 950px) {
+
+    html,
+    body {
+        overflow: auto;
+    }
+
+    .app-container {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .main-workspace {
+        flex-direction: column;
+    }
+
+    .sprite-preview-panel {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .pivot-main-workspace {
+        flex-direction: column;
+    }
+
+    .pivot-frames-panel {
+        width: 100%;
+        height: 260px;
+    }
+
+    .bottom-bar {
+        padding: 8px 16px;
+        gap: 8px;
+    }
+
+    .rename-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    }
+}
