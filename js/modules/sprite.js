@@ -1,10 +1,9 @@
 /**
- * Media & Sprite Studio - Sprite Studio Module (Theme-Aware with Palette Integration)
+ * Media & Sprite Studio - Sprite Studio Module
  */
 import { Store } from '../state.js';
 import { toEnDigits, showProgress, updateProgress, hideProgress } from '../utils.js';
 import { Collage } from './collage.js';
-import { PalettePicker } from './palette.js';
 
 export const Sprite = {
   uploadInput: document.getElementById('spriteUpload'),
@@ -24,7 +23,7 @@ export const Sprite = {
   rowsDecBtn: document.getElementById('spriteRowsDecBtn'),
 
   totalFramesBadge: document.getElementById('totalFramesBadge'),
-  bgPreview: document.getElementById('spriteBgColorPreview'),
+  bgColorInput: document.getElementById('spriteBgColor'),
 
   animCanvas: document.getElementById('animCanvas'),
   animCtx: document.getElementById('animCanvas')?.getContext('2d'),
@@ -35,6 +34,11 @@ export const Sprite = {
   fpsVal: document.getElementById('fpsVal'),
 
   openPivotBtn: document.getElementById('openPivotEditorBtn'),
+  exportMp4Btn: document.getElementById('exportSpriteMp4Btn'),
+  exportGifBtn: document.getElementById('exportSpriteGifBtn'),
+  exportZipBtn: document.getElementById('exportZipBtn'),
+  transferBtn: document.getElementById('transferToCollageBtn'),
+
   editOrderBtn: document.getElementById('editSpriteOrderBtn'),
   editActions: document.getElementById('editModeActions'),
   confirmOrderBtn: document.getElementById('confirmSpriteOrderBtn'),
@@ -60,19 +64,6 @@ export const Sprite = {
 
     this.uploadInput?.addEventListener('change', (e) => {
       if (e.target.files && e.target.files[0]) this.loadImage(e.target.files[0]);
-    });
-
-    // ربط منتقي الألوان العائم
-    document.querySelector('.trigger-palette[data-target="spriteBg"]')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      PalettePicker.open('spriteBg', this.bgPreview, (chosenColor) => {
-        Store.spriteBgColor = chosenColor;
-        if (this.bgPreview) {
-          this.bgPreview.style.backgroundColor = chosenColor === 'transparent' ? 'none' : chosenColor;
-        }
-        this.render();
-        this.drawAnimFrame();
-      });
     });
 
     this.colsIncBtn?.addEventListener('click', () => {
@@ -121,6 +112,14 @@ export const Sprite = {
       this.updateGrid();
     });
 
+    this.bgColorInput?.addEventListener('input', (e) => {
+      Store.spriteBgColor = e.target.dataset.transparent === 'true' ? 'transparent' : e.target.value;
+      const circle = document.getElementById('spriteBgColorCircleBtn');
+      if (circle) circle.style.backgroundColor = e.target.value;
+      this.render();
+      this.drawAnimFrame();
+    });
+
     this.fpsInput?.addEventListener('input', (e) => {
       if (this.fpsVal) this.fpsVal.textContent = toEnDigits(e.target.value);
       if (Store.isPlaying) {
@@ -164,7 +163,7 @@ export const Sprite = {
       this.selectDeleteBtn.style.display = 'none';
       this.deleteActions.style.display = 'flex';
       this.wrapper.classList.add('deleting');
-      this.deleteBadge.textContent = `تم تحديد ${toEnDigits(0)} فريم`;
+      this.deleteBadge.textContent = `تم تحديد ${toEnDigits(0)}`;
       this.render();
     });
 
@@ -184,6 +183,12 @@ export const Sprite = {
       this.render();
       this.drawAnimFrame();
     });
+
+    // أزرار التصدير الموجودة في الهيدر العلوي
+    this.exportMp4Btn?.addEventListener('click', () => this.exportMP4());
+    this.exportGifBtn?.addEventListener('click', () => this.exportGIF());
+    this.exportZipBtn?.addEventListener('click', () => this.exportZIP());
+    this.transferBtn?.addEventListener('click', () => this.transferFrames());
   },
 
   loadImage(file) {
@@ -195,9 +200,11 @@ export const Sprite = {
         this.emptyNotice.style.display = 'none';
         this.wrapper.style.display = 'flex';
 
-        [this.playPauseBtn, this.openPivotBtn, this.editOrderBtn, this.selectDeleteBtn].forEach(b => {
-          if (b) b.disabled = false;
-        });
+        [
+          this.playPauseBtn, this.openPivotBtn, this.exportMp4Btn,
+          this.exportGifBtn, this.exportZipBtn, this.transferBtn,
+          this.editOrderBtn, this.selectDeleteBtn
+        ].forEach(b => { if (b) b.disabled = false; });
 
         this.exitEditMode(false);
         this.exitDeleteMode();
@@ -251,13 +258,14 @@ export const Sprite = {
     const rows = parseInt(toEnDigits(this.rowsNum.value)) || 1;
     const cellW = this.canvas.width / cols;
     const cellH = this.canvas.height / rows;
-    const bgColor = Store.spriteBgColor || '#FFFFFF';
 
-    if (bgColor !== 'transparent') {
+    const bgColor = this.bgColorInput?.dataset.transparent === 'true' ? 'transparent' : (this.bgColorInput?.value || Store.spriteBgColor || '#FFFFFF');
+
+    if (bgColor === 'transparent') {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    } else {
       this.ctx.fillStyle = bgColor;
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    } else {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     for (let i = 0; i < Store.slicedFrames.length; i++) {
@@ -297,7 +305,7 @@ export const Sprite = {
       }
     }
 
-    this.ctx.strokeStyle = Store.isSpriteEditMode ? 'rgba(255, 59, 92, 0.7)' : '#FF3B5C';
+    this.ctx.strokeStyle = Store.isSpriteEditMode ? 'rgba(255, 59, 92, 0.7)' : (Store.isSpriteDeleteMode ? 'rgba(255, 59, 92, 0.5)' : '#FF3B5C');
     this.ctx.lineWidth = Math.max(1, Math.min(cellW, cellH) * 0.02);
 
     for (let c = 1; c < cols; c++) {
@@ -311,6 +319,16 @@ export const Sprite = {
       this.ctx.moveTo(0, r * cellH);
       this.ctx.lineTo(this.canvas.width, r * cellH);
       this.ctx.stroke();
+    }
+
+    if (Store.isSpriteEditMode && Store.selectedFrameIndex !== null) {
+      const r = Math.floor(Store.selectedFrameIndex / cols);
+      const c = Store.selectedFrameIndex % cols;
+      this.ctx.fillStyle = 'rgba(0, 200, 83, 0.35)';
+      this.ctx.fillRect(c * cellW, r * cellH, cellW, cellH);
+      this.ctx.strokeStyle = '#00E676';
+      this.ctx.lineWidth = Math.max(3, Math.min(cellW, cellH) * 0.04);
+      this.ctx.strokeRect(c * cellW, r * cellH, cellW, cellH);
     }
   },
 
@@ -337,7 +355,7 @@ export const Sprite = {
     if (Store.isSpriteDeleteMode) {
       if (Store.selectedSpriteDeleteFrames.has(idx)) Store.selectedSpriteDeleteFrames.delete(idx);
       else Store.selectedSpriteDeleteFrames.add(idx);
-      this.deleteBadge.textContent = `تم تحديد ${toEnDigits(Store.selectedSpriteDeleteFrames.size)} فريم`;
+      this.deleteBadge.textContent = `تم تحديد ${toEnDigits(Store.selectedSpriteDeleteFrames.size)}`;
     } else if (Store.isSpriteEditMode) {
       if (Store.selectedFrameIndex === null) {
         Store.selectedFrameIndex = idx;
@@ -386,12 +404,12 @@ export const Sprite = {
     this.animCanvas.width = frame.width;
     this.animCanvas.height = frame.height;
     
-    const bgColor = Store.spriteBgColor || '#FFFFFF';
-    if (bgColor !== 'transparent') {
+    const bgColor = this.bgColorInput?.dataset.transparent === 'true' ? 'transparent' : (this.bgColorInput?.value || Store.spriteBgColor || '#FFFFFF');
+    if (bgColor === 'transparent') {
+      this.animCtx.clearRect(0, 0, this.animCanvas.width, this.animCanvas.height);
+    } else {
       this.animCtx.fillStyle = bgColor;
       this.animCtx.fillRect(0, 0, this.animCanvas.width, this.animCanvas.height);
-    } else {
-      this.animCtx.clearRect(0, 0, this.animCanvas.width, this.animCanvas.height);
     }
 
     this.animCtx.imageSmoothingEnabled = false;
@@ -417,10 +435,9 @@ export const Sprite = {
     if (Store.animInterval) clearInterval(Store.animInterval);
   },
 
-  // أزرار التصدير المنفذة مباشرة من الشريط العلوي
   async exportMP4() {
     if (!Store.slicedFrames.length) return;
-    showProgress('جاري تصدير MP4...');
+    showProgress('جاري تصدير فيديو الحركة MP4...');
 
     const fps = parseInt(toEnDigits(this.fpsInput.value)) || 12;
     const duration = 1000 / fps;
@@ -430,7 +447,7 @@ export const Sprite = {
     rCanvas.width = Store.slicedFrames[0].width;
     rCanvas.height = Store.slicedFrames[0].height;
     const rCtx = rCanvas.getContext('2d');
-    const bgColor = Store.spriteBgColor || '#FFFFFF';
+    const bgColor = this.bgColorInput?.dataset.transparent === 'true' ? '#000000' : (this.bgColorInput?.value || Store.spriteBgColor || '#FFFFFF');
 
     const stream = rCanvas.captureStream(fps);
     let mime = 'video/mp4';
@@ -452,7 +469,7 @@ export const Sprite = {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = isMp4 ? 'sprite_anim.mp4' : 'sprite_anim.webm';
+        a.download = isMp4 ? 'sprite_animation.mp4' : 'sprite_animation.webm';
         a.click();
         URL.revokeObjectURL(url);
         res();
@@ -461,12 +478,8 @@ export const Sprite = {
 
     rec.start();
     for (let i = 0; i < total; i++) {
-      if (bgColor !== 'transparent') {
-        rCtx.fillStyle = bgColor;
-        rCtx.fillRect(0, 0, rCanvas.width, rCanvas.height);
-      } else {
-        rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
-      }
+      rCtx.fillStyle = bgColor;
+      rCtx.fillRect(0, 0, rCanvas.width, rCanvas.height);
       rCtx.drawImage(Store.slicedFrames[i], 0, 0);
       updateProgress(((i + 1) / total) * 100);
       await new Promise(r => setTimeout(r, duration));
@@ -479,18 +492,16 @@ export const Sprite = {
 
   exportGIF() {
     if (!Store.slicedFrames.length || !window.gifshot) return;
-    showProgress('جاري تصدير GIF...');
-    const bgColor = Store.spriteBgColor || '#FFFFFF';
+    showProgress('جاري تركيب ملف GIF...');
+    const bgColor = this.bgColorInput?.dataset.transparent === 'true' ? '#FFFFFF' : (this.bgColorInput?.value || Store.spriteBgColor || '#FFFFFF');
     
     const images = Store.slicedFrames.map(f => {
       const c = document.createElement('canvas');
       c.width = f.width;
       c.height = f.height;
       const ctx = c.getContext('2d');
-      if (bgColor !== 'transparent') {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, c.width, c.height);
-      }
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, c.width, c.height);
       ctx.drawImage(f, 0, 0);
       return c.toDataURL('image/png');
     });
@@ -507,7 +518,7 @@ export const Sprite = {
       if (!obj.error) {
         const a = document.createElement('a');
         a.href = obj.image;
-        a.download = 'sprite_anim.gif';
+        a.download = 'sprite_animation.gif';
         a.click();
       }
       hideProgress();
@@ -516,7 +527,7 @@ export const Sprite = {
 
   async exportZIP() {
     if (!Store.slicedFrames.length || !window.JSZip) return;
-    showProgress('جاري ضغط الفريمات...');
+    showProgress('جاري ضغط الإطارات...');
     const zip = new JSZip();
     const folder = zip.folder('sprite_frames');
 
