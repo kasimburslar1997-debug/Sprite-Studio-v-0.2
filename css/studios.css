@@ -1,16 +1,245 @@
+/**
+ * Media & Sprite Studio - Studios Specific Styles (Clean Dark Mode & Canvases)
+ */
+
 /* =======================================================
-   استوديو إعادة التسمية (دعم نقي ومتكامل للوضع الليلي)
+   1. بطاقة الكانفاس المشتركة ومنطقة الإفلات
+   ======================================================= */
+.canvas-card {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  background: var(--canvas-card-bg);
+  border-radius: var(--radius-xl);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 16px;
+  border: 3px dashed transparent;
+  transition: border-color 0.3s, background-color 0.3s;
+  cursor: pointer;
+}
+
+.empty-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.upload-circle {
+  width: 60px;
+  height: 60px;
+  background: var(--upload-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.upload-symbol {
+  font-size: 32px;
+  color: var(--accent-red);
+}
+
+/* =======================================================
+   2. استوديو التجميع (Collage Studio)
+   ======================================================= */
+#previewCanvas {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+  display: none;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  transition: box-shadow 0.2s ease;
+}
+
+#previewCanvas.selecting {
+  cursor: crosshair;
+  box-shadow: 0 0 0 3.5px #FF3B5C, 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* =======================================================
+   3. استوديو السبرايت (Sprite Studio)
+   ======================================================= */
+.sprite-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#spriteCanvas {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
+.sprite-preview-panel {
+  width: 320px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.anim-card {
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.anim-box {
+  width: 100%;
+  flex: 1;
+  min-height: 180px;
+  background: var(--bg-color);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 12px;
+}
+
+#animCanvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
+.anim-controls {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.anim-controls .play-btn {
+  width: 100%;
+  max-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.control-group.vertical {
+  flex-direction: column;
+  width: 100%;
+  gap: 6px;
+  align-items: center;
+}
+
+.control-group.vertical .custom-slider {
+  width: 90%;
+}
+
+/* =======================================================
+   4. استوديو استخراج الفيديو (Video Studio)
+   ======================================================= */
+.video-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#mainVideoPlayer {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  background-color: #000;
+  outline: none;
+}
+
+.video-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  font-size: 13px;
+  color: var(--text-main);
+  padding: 4px;
+}
+
+.video-info-list .info-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--slider-track);
+  padding-bottom: 4px;
+}
+
+.video-info-list b {
+  font-family: 'Comfortaa', sans-serif;
+  direction: ltr;
+}
+
+.video-notice-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-color);
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* =======================================================
+   5. استوديو إعادة التسمية (Rename Studio - توافق نقي للدارك مود)
    ======================================================= */
 .rename-workspace {
   width: 100%;
   height: 100%;
 }
 
+/* تم إزالة الخلفية البيضاء الإجبارية لتتوافق مع الوضع الليلي بسلاسة */
 .rename-canvas-card {
   flex-direction: column;
   justify-content: flex-start;
   align-items: stretch;
-  padding: 16px;
+  padding: 14px;
   cursor: default;
   background-color: var(--canvas-card-bg);
   border: 1px solid var(--slider-track);
@@ -27,14 +256,81 @@
   background-color: transparent;
 }
 
+.rename-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-button);
+  flex-shrink: 0;
+  border: 1px solid var(--slider-track);
+}
+
+.rename-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rename-header-btn {
+  padding: 6px 14px;
+  font-size: 12.5px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-color);
+  color: var(--text-main);
+  box-shadow: none;
+}
+
+.rename-header-btn:hover {
+  background: var(--upload-bg);
+  color: var(--accent-red);
+}
+
+.rename-cancel-btn {
+  color: #DC3545;
+}
+
+.rename-status-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rename-badge-pill {
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bg-color);
+  color: var(--text-main);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+}
+
+.highlight-badge {
+  background: var(--upload-bg);
+  color: var(--accent-red);
+}
+
 .rename-grid-scroll {
   flex: 1;
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 6px 8px 16px 8px;
+  padding: 6px 4px 16px 4px;
   touch-action: pan-y;
   background-color: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 59, 92, 0.3) transparent;
+}
+
+.rename-grid-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rename-grid-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 59, 92, 0.3);
+  border-radius: 12px;
 }
 
 .rename-grid {
@@ -44,30 +340,58 @@
   width: 100%;
 }
 
+/* بطاقة الصورة متوافقة تماماً مع الثيمين */
 .rename-grid-card {
   position: relative;
   background: var(--card-bg);
   border-radius: 14px;
-  padding: 6px;
-  box-shadow: var(--shadow-button);
+  padding: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   border: 1.5px solid var(--slider-track);
   touch-action: none;
 }
 
 .rename-grid-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   border-color: rgba(255, 59, 92, 0.4);
 }
 
 .rename-grid-card.selected {
   border-color: var(--accent-red);
   background: var(--upload-bg);
+  box-shadow: 0 4px 14px rgba(255, 59, 92, 0.22);
+}
+
+.rename-checkbox-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #FFFFFF;
+  backdrop-filter: blur(4px);
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.rename-grid-card.selected .rename-checkbox-badge {
+  background: var(--accent-red);
+}
+
+.rename-checkbox-badge .material-symbols-rounded {
+  font-size: 16px;
 }
 
 .rename-card-thumb {
@@ -75,14 +399,7 @@
   aspect-ratio: 1 / 1;
   border-radius: 10px;
   overflow: hidden;
-  /* خلفية شبكية شفافة للمعاينة تناسب كل الصور والأيقونات الشفافة في الوضعين */
-  background-color: var(--bg-color);
-  background-image: linear-gradient(45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
-                    linear-gradient(-45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
-                    linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.04) 75%),
-                    linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.04) 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background: var(--bg-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,5 +423,226 @@
   overflow: hidden;
   text-overflow: ellipsis;
   direction: ltr;
-  padding: 2px 4px;
+  padding: 2px 4px 4px 4px;
+}
+
+/* =======================================================
+   6. نافذة محرر نقطة الارتكاز (Pivot Editor Modal)
+   ======================================================= */
+.pivot-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-color);
+  z-index: 2000;
+  overflow: hidden;
+  padding: 16px;
+}
+
+.pivot-modal-overlay.active {
+  display: flex;
+  flex-direction: column;
+}
+
+.pivot-modal-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pivot-modal-header {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.pivot-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.pivot-main-workspace {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pivot-canvas-wrapper {
+  flex: 1;
+  height: 100%;
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+#pivotCanvas {
+  max-width: 100%;
+  max-height: calc(100% - 60px);
+  object-fit: contain;
+  cursor: crosshair;
+  border-radius: 12px;
+}
+
+.pivot-bottom-controls {
+  position: absolute;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.pivot-coord-badge {
+  background: var(--bg-color);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.coord-label {
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--accent-red);
+}
+
+.coord-input {
+  width: 48px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  text-align: center;
+  font-family: 'Comfortaa', sans-serif;
+  direction: ltr;
+}
+
+.pivot-tool-btn {
+  background: var(--bg-color);
+}
+
+.pivot-tool-btn.active-onion {
+  background: var(--upload-bg);
+  color: var(--accent-red);
+  border: 1.5px solid var(--accent-red);
+}
+
+.pivot-confirm-btn {
+  background: var(--accent-red);
+  color: #FFFFFF;
+  border-radius: var(--radius-pill);
+  padding: 10px 22px;
+}
+
+.pivot-preset-container {
+  position: relative;
+}
+
+.pivot-presets-popup {
+  position: absolute;
+  bottom: 54px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-bg);
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 100;
+  border: 1px solid var(--slider-track);
+}
+
+.presets-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.presets-grid-3x3 {
+  display: grid;
+  grid-template-columns: repeat(3, 24px);
+  grid-template-rows: repeat(3, 24px);
+  gap: 8px;
+}
+
+.preset-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--slider-track);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-dot.active {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+.pivot-frames-panel {
+  width: 440px;
+  height: 100%;
+  background: var(--card-bg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.pivot-frames-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.pivot-frame-thumb-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--canvas-card-bg);
+  border-radius: 14px;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-button);
+  overflow: hidden;
+}
+
+.pivot-frame-thumb-card.active-thumb {
+  border: 3px solid var(--accent-red);
+  box-shadow: 0 4px 15px rgba(255, 59, 92, 0.3);
+}
+
+.thumb-number {
+  position: absolute;
+  bottom: 4px;
+  left: 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-main);
+  font-family: 'Comfortaa', sans-serif;
+  direction: ltr;
 }
