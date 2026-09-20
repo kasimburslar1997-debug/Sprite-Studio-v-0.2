@@ -2,7 +2,6 @@
  * Media & Sprite Studio - Central State Store
  */
 export const Store = {
-  // الثيم الأساسي (يُحدد تلقائياً حسب الوقت أو تفضيل المستخدم)
   theme: 'light',
 
   // 1. استوديو التجميع
@@ -47,5 +46,14 @@ export const Store = {
   renameBaseName: '',
   renameDigits: 2,
   renameStart: 1,
-  renameEnd: 1
+  renameEnd: 1,
+
+  // 5. استوديو القص والتحريك (Crop & Motion Studio)
+  cropFrames: [],
+  cropHistory: [],
+  cropCurrentIndex: 0,
+  cropIsPlaying: false,
+  cropFps: 12,
+  cropCoords: { top: 0, bottom: 100, left: 0, right: 100 },
+  cropIsAllLayersMode: false
 };
