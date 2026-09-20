@@ -1,5 +1,5 @@
 /**
- * Media & Sprite Studio - Rename Studio Module (Pure Theme-Aware Dark Mode)
+ * Media & Sprite Studio - Rename Studio Module (Dark Mode Native)
  */
 import { Store } from '../state.js';
 import { toEnDigits, showProgress, updateProgress, hideProgress } from '../utils.js';
@@ -8,18 +8,17 @@ export const RenameStudio = {
   uploadInput: document.getElementById('renameUpload'),
   dropZone: document.getElementById('renameDropZone'),
   importBtn: document.getElementById('renameImportActionBtn'),
-  clearBtn: document.getElementById('renameClearBtn'),
+  clearBottomBtn: document.getElementById('renameClearBtn'),
+  clearTopBtn: document.getElementById('renameClearTopBtn'),
   emptyNotice: document.getElementById('renameEmptyNotice'),
   gridContainer: document.getElementById('renameGridContainer'),
   grid: document.getElementById('renameGrid'),
 
-  // أدوات التحديد العلوية
   selectAllBtn: document.getElementById('renameSelectAllBtn'),
   deselectAllBtn: document.getElementById('renameDeselectAllBtn'),
   selectCountBadge: document.getElementById('renameSelectCountBadge'),
   totalCountBadge: document.getElementById('renameTotalCountBadge'),
 
-  // عناصر التحكم السفلية
   baseNameInput: document.getElementById('renameBaseInput'),
 
   digitsNum: document.getElementById('renameDigitsNum'),
@@ -34,7 +33,9 @@ export const RenameStudio = {
   endIncBtn: document.getElementById('renameEndIncBtn'),
   endDecBtn: document.getElementById('renameEndDecBtn'),
 
+  // الأزرار في الشريط العلوي للهيدر
   applyBtn: document.getElementById('renameApplyBtn'),
+  exportZipBtn: document.getElementById('renameExportZipBtn'),
 
   longPressTimer: null,
   isDragSelecting: false,
@@ -56,26 +57,27 @@ export const RenameStudio = {
 
     this.uploadInput?.addEventListener('change', (e) => this.loadFiles(e.target.files));
 
-    // السحب والإفلات
-    this.dropZone?.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      this.dropZone.style.borderColor = 'var(--accent-red)';
+    ['dragenter', 'dragover'].forEach(n => {
+      this.dropZone?.addEventListener(n, (e) => {
+        e.preventDefault();
+        this.dropZone.style.borderColor = 'var(--accent-red)';
+      });
     });
-    this.dropZone?.addEventListener('dragleave', () => {
-      this.dropZone.style.borderColor = 'transparent';
+    ['dragleave', 'drop'].forEach(n => {
+      this.dropZone?.addEventListener(n, (e) => {
+        e.preventDefault();
+        this.dropZone.style.borderColor = 'transparent';
+      });
     });
     this.dropZone?.addEventListener('drop', (e) => {
       e.preventDefault();
-      this.dropZone.style.borderColor = 'transparent';
       if (e.dataTransfer.files) this.loadFiles(e.dataTransfer.files);
     });
 
-    // خانة الاسم
     this.baseNameInput?.addEventListener('input', (e) => {
       Store.renameBaseName = e.target.value.trim();
     });
 
-    // خانات الترقيم
     this.digitsIncBtn?.addEventListener('click', () => {
       let current = parseInt(toEnDigits(this.digitsNum.value)) || 1;
       this.digitsNum.value = toEnDigits(Math.min(10, current + 1));
@@ -93,7 +95,6 @@ export const RenameStudio = {
       Store.renameDigits = Math.max(1, parseInt(toEnDigits(this.digitsNum.value)) || 1);
     });
 
-    // بداية الترقيم
     this.startIncBtn?.addEventListener('click', () => {
       let current = parseInt(toEnDigits(this.startNum.value)) || 0;
       this.startNum.value = toEnDigits(current + 1);
@@ -114,7 +115,6 @@ export const RenameStudio = {
       this.syncEndRange();
     });
 
-    // نهاية الترقيم
     this.endIncBtn?.addEventListener('click', () => {
       let current = parseInt(toEnDigits(this.endNum.value)) || 0;
       this.endNum.value = toEnDigits(current + 1);
@@ -132,15 +132,16 @@ export const RenameStudio = {
       Store.renameEnd = Math.max(Store.renameStart, parseInt(toEnDigits(this.endNum.value)) || Store.renameStart);
     });
 
-    // التحديد والمسح
     this.selectAllBtn?.addEventListener('click', () => this.selectAll());
     this.deselectAllBtn?.addEventListener('click', () => this.deselectAll());
-    this.clearBtn?.addEventListener('click', () => this.clearAll());
+    
+    // زر المسح المزدوج (في الهيدر الداخلي والشريط السفلي)
+    this.clearTopBtn?.addEventListener('click', () => this.clearAll());
+    this.clearBottomBtn?.addEventListener('click', () => this.clearAll());
 
-    // التطبيق
     this.applyBtn?.addEventListener('click', () => this.applyRename());
+    this.exportZipBtn?.addEventListener('click', () => this.exportZIP());
 
-    // أحداث اللمس والسحب
     window.addEventListener('pointerup', () => this.endDragSelection());
     window.addEventListener('pointercancel', () => this.endDragSelection());
     this.grid?.addEventListener('pointermove', (e) => this.handleDragOverCards(e));
@@ -192,7 +193,7 @@ export const RenameStudio = {
       const cleanName = dotIndex !== -1 ? originalName.substring(0, dotIndex) : originalName;
 
       loaded.push({
-        id: `img_${Date.now()}_${i}`,
+        id: `img_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 5)}`,
         file,
         originalName,
         cleanName,
@@ -220,8 +221,9 @@ export const RenameStudio = {
     if (this.gridContainer) this.gridContainer.style.display = hasImages ? 'flex' : 'none';
     if (this.totalCountBadge) this.totalCountBadge.textContent = `إجمالي الصور: ${toEnDigits(Store.renameImages.length)}`;
 
-    if (this.applyBtn) this.applyBtn.disabled = !hasImages;
-    if (this.clearBtn) this.clearBtn.disabled = !hasImages;
+    [this.applyBtn, this.exportZipBtn, this.clearBottomBtn, this.clearTopBtn].forEach(btn => {
+      if (btn) btn.disabled = !hasImages;
+    });
 
     this.updateSelectCountBadge();
   },
@@ -237,7 +239,6 @@ export const RenameStudio = {
     this.syncEndRange();
   },
 
-  // بناء الشبكة مع التوافق التام مع الثيم بدون أي فرض للون الأبيض
   renderGrid() {
     if (!this.grid) return;
     this.grid.innerHTML = '';
@@ -285,6 +286,7 @@ export const RenameStudio = {
         this.isDragSelecting = true;
         this.dragSelectAction = !Store.selectedRenameIndices.has(index);
         this.toggleItemSelection(index, this.dragSelectAction);
+        
         if (navigator.vibrate) navigator.vibrate(35);
       }, 350);
     });
@@ -386,11 +388,12 @@ export const RenameStudio = {
       ? Array.from(Store.selectedRenameIndices).sort((a, b) => a - b)
       : Store.renameImages.map((_, i) => i);
 
-    showProgress('جاري تطبيق الأسماء...');
+    showProgress('جاري تطبيق الأسماء الجديدة...');
 
     targetIndices.forEach((targetIdx, order) => {
       const currentNumber = start + order;
       const formattedNum = String(currentNumber).padStart(digits, '0');
+
       const newFileName = rawBase !== '' ? `${rawBase}_${formattedNum}` : formattedNum;
       Store.renameImages[targetIdx].newName = newFileName;
     });
@@ -405,13 +408,14 @@ export const RenameStudio = {
   async exportZIP() {
     if (!Store.renameImages.length || !window.JSZip) return;
 
-    showProgress('جاري ضغط الملفات...');
+    showProgress('جاري تجهيز وضغط الصور...');
     const zip = new JSZip();
     const folder = zip.folder('renamed_images');
     const total = Store.renameImages.length;
 
     for (let i = 0; i < total; i++) {
       const item = Store.renameImages[i];
+      
       const offCanvas = document.createElement('canvas');
       offCanvas.width = item.img.naturalWidth || item.img.width;
       offCanvas.height = item.img.naturalHeight || item.img.height;
@@ -424,13 +428,14 @@ export const RenameStudio = {
       updateProgress(((i + 1) / total) * 70);
     }
 
+    showProgress('جاري ضغط الحزمة النهائية...');
     const content = await zip.generateAsync({ type: 'blob' }, (meta) => {
       updateProgress(70 + (meta.percent * 0.3));
     });
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(content);
-    link.download = 'renamed_images.zip';
+    link.download = 'renamed_images_png.zip';
     link.click();
     URL.revokeObjectURL(link.href);
 
