@@ -24,10 +24,11 @@
   <link rel="stylesheet" href="css/studios.css">
   <link rel="stylesheet" href="css/responsive.css">
 
-  <!-- مكتبات المعالجة الخارجية -->
+  <!-- مكتبات المعالجة الخارجية (ZIP / PDF / GIF / Video / GIF Parser) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/build/gifshot.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/dist/gifuct.min.js"></script>
 </head>
 
 <body>
@@ -36,9 +37,10 @@
     <!-- الشريط العلوي الذكي الموزع -->
     <header class="app-header">
       
-      <!-- الجهة اليمنى: أزرار التصدير والإجراءات بحسب القسم النشط -->
+      <!-- أزرار التصدير والإجراءات بحسب القسم النشط (الجهة اليمنى في RTL) -->
       <div class="header-group header-actions-group" id="headerDynamicActions">
-        <!-- أزرار التجميع -->
+        
+        <!-- 1. أزرار التجميع -->
         <div id="collageHeaderActions" class="tab-header-actions active-actions">
           <button id="exportPNGBtn" class="pill-btn header-pill-btn"><span
               class="material-symbols-rounded red-icon">image</span> PNG</button>
@@ -46,7 +48,7 @@
               class="material-symbols-rounded red-icon">picture_as_pdf</span> PDF</button>
         </div>
 
-        <!-- أزرار السبرايت -->
+        <!-- 2. أزرار السبرايت -->
         <div id="spriteHeaderActions" class="tab-header-actions">
           <button id="openPivotEditorBtn" class="pill-btn header-pill-btn highlight-tool-btn" title="نقطة الارتكاز" disabled><span
               class="material-symbols-rounded">adjust</span> الارتكاز</button>
@@ -60,7 +62,7 @@
               class="material-symbols-rounded red-icon">move_down</span> للتجميع</button>
         </div>
 
-        <!-- أزرار الفيديو -->
+        <!-- 3. أزرار استخراج الفيديو -->
         <div id="videoHeaderActions" class="tab-header-actions">
           <button id="extractGifBtn" class="pill-btn header-pill-btn" disabled><span
               class="material-symbols-rounded">gif</span> تصدير GIF</button>
@@ -70,16 +72,29 @@
               class="material-symbols-rounded red-icon">move_down</span> للتجميع</button>
         </div>
 
-        <!-- أزرار إعادة التسمية -->
+        <!-- 4. أزرار إعادة التسمية -->
         <div id="renameHeaderActions" class="tab-header-actions">
           <button id="renameApplyBtn" class="pill-btn header-pill-btn primary-action" disabled><span
               class="material-symbols-rounded">check</span> تطبيق التسمية</button>
           <button id="renameExportZipBtn" class="pill-btn header-pill-btn" disabled><span
               class="material-symbols-rounded red-icon">download</span> تحميل ZIP</button>
         </div>
+
+        <!-- 5. أزرار استوديو القص والتحريك الجديد -->
+        <div id="cropHeaderActions" class="tab-header-actions">
+          <button id="undoCropBtn" class="pill-btn header-pill-btn" title="تراجع عن آخر قص" disabled><span
+              class="material-symbols-rounded">undo</span> تراجع</button>
+          <button id="exportCropPngBtn" class="pill-btn header-pill-btn" disabled><span
+              class="material-symbols-rounded red-icon">folder_zip</span> إطارات ZIP</button>
+          <button id="exportCropGifBtn" class="pill-btn header-pill-btn" disabled><span
+              class="material-symbols-rounded red-icon">gif</span> GIF</button>
+          <button id="exportCropMp4Btn" class="pill-btn header-pill-btn" disabled><span
+              class="material-symbols-rounded red-icon">videocam</span> MP4</button>
+        </div>
+
       </div>
 
-      <!-- الوسط: أزرار التبويبات -->
+      <!-- الوسط: أزرار التبويبات الخمسة -->
       <nav class="tabs-container">
         <button id="tabCollageBtn" class="tab-btn active"><span class="material-symbols-rounded">grid_view</span>
           التجميع</button>
@@ -88,9 +103,10 @@
         <button id="tabVideoBtn" class="tab-btn"><span class="material-symbols-rounded">movie</span> الفيديو</button>
         <button id="tabRenameBtn" class="tab-btn"><span class="material-symbols-rounded">edit_note</span> إعادة
           التسمية</button>
+        <button id="tabCropBtn" class="tab-btn"><span class="material-symbols-rounded">crop</span> القص والتحريك</button>
       </nav>
 
-      <!-- الجهة اليسرى: التحكم بالنظام والثيم وملء الشاشة -->
+      <!-- أزرار التحكم بالثيم وملء الشاشة (الجهة اليسرى في RTL) -->
       <div class="header-group header-controls-group">
         <button id="themeToggleBtn" class="icon-btn" title="تغيير المظهر">
           <span id="themeIcon" class="material-symbols-rounded">dark_mode</span>
@@ -141,7 +157,6 @@
           </div>
         </div>
 
-        <!-- زر وقائمة النسب العالمية المتوافقة بدقة -->
         <div class="ratio-picker-container">
           <button id="collageRatioBtn" class="pill-btn ratio-btn">
             <span id="ratioBtnPreview" class="ratio-btn-preview"><span class="ratio-box-icon r-1-1"></span></span>
@@ -416,16 +431,90 @@
             class="material-symbols-rounded">cleaning_services</span></button>
       </div>
     </section>
+
+    <!-- 5. استوديو القص والتحريك الجديد (Crop & Motion Studio) -->
+    <section id="cropView" class="view-section">
+      <div class="main-workspace full-workspace">
+        <div id="cropDropZone" class="canvas-card crop-canvas-card empty-crop-card">
+          
+          <!-- الرسالة الإرشادية لرفع الملفات -->
+          <div id="cropPlaceholder" class="empty-placeholder">
+            <div class="upload-circle"><span class="material-symbols-rounded upload-symbol">crop</span></div>
+            <span id="cropPlaceholderText">اضغط هنا أو اسحب وأفلت صور PNG أو متحركة GIF أو فيديو</span>
+          </div>
+
+          <!-- مساحة العرض والكانفاس مع طبقة القص التفاعلية -->
+          <div class="crop-stage-box" id="cropStageBox" style="display: none;">
+            <canvas id="cropStage"></canvas>
+            
+            <div class="crop-overlay" id="cropOverlay" style="display: none;">
+              <div class="crop-mask-box"></div>
+              <div class="crop-line horizontal top" id="cropLineTop"></div>
+              <div class="crop-line horizontal bottom" id="cropLineBottom"></div>
+              <div class="crop-line vertical left" id="cropLineLeft"></div>
+              <div class="crop-line vertical right" id="cropLineRight"></div>
+            </div>
+          </div>
+
+          <!-- مدخل الملفات الخفي -->
+          <input type="file" id="cropFileInput" accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm, video/quicktime, .mov" multiple style="display:none">
+        </div>
+      </div>
+
+      <!-- شريط أدوات القص السفلي -->
+      <div class="bottom-bar scrollable-bar">
+        <button id="cropImportBtn" class="pill-btn import-btn"><span class="material-symbols-rounded">add</span>
+          إضافة وسائط</button>
+        <div class="divider"></div>
+
+        <!-- زر تطبيق القص -->
+        <button id="applyCropBtn" class="pill-btn primary-action" disabled>
+          <span class="material-symbols-rounded">crop</span> تطبيق القص
+        </button>
+
+        <!-- زر تراكب كافة الطبقات 100% لتحديد حدود الحركة -->
+        <button id="cropAllLayersBtn" class="pill-btn" title="معاينة كافة الطبقات معاً لتحديد أبعاد القص بدقة" disabled>
+          <span class="material-symbols-rounded red-icon">layers</span> معاينة الكل
+        </button>
+
+        <!-- زر التشغيل / الإيقاف المؤقت -->
+        <button id="cropPlayBtn" class="icon-btn" title="تشغيل / إيقاف" disabled>
+          <span id="cropPlayIcon" class="material-symbols-rounded">play_arrow</span>
+        </button>
+
+        <!-- شريط التمرير الزمني بين الإطارات -->
+        <div class="control-group" style="flex: 1; min-width: 140px;">
+          <input type="range" id="cropTimeline" class="custom-slider" min="0" max="0" value="0" style="width: 100%;" disabled>
+        </div>
+
+        <!-- عداد الإطارات الحالي -->
+        <span id="cropFrameIndicator" class="counter-badge" style="font-family: 'Comfortaa', sans-serif;">0 / 0</span>
+
+        <!-- متحكم السرعة (FPS) -->
+        <div class="control-group">
+          <span class="label-text">السرعة</span>
+          <div class="stepper-widget">
+            <button id="cropSpeedDecBtn" class="stepper-arrow-btn" disabled><span class="material-symbols-rounded">remove</span></button>
+            <input id="cropFpsNum" class="stepper-number-input" type="text" value="12" style="width: 36px;" readonly>
+            <button id="cropSpeedIncBtn" class="stepper-arrow-btn" disabled><span class="material-symbols-rounded">add</span></button>
+          </div>
+        </div>
+
+        <!-- زر المسح والبدء من جديد -->
+        <button id="cropClearBtn" class="icon-btn broom-btn" title="مسح الكل والبدء من جديد" disabled>
+          <span class="material-symbols-rounded">cleaning_services</span>
+        </button>
+      </div>
+    </section>
+
   </div>
 
   <!-- الشريط العائم لاختيار الألوان (Universal Floating Color Palette Bar) -->
   <div id="floatingColorBar" class="floating-color-bar" style="display: none;">
     <div class="floating-color-sticky-tools">
-      <!-- زر بدون لون / شفاف -->
       <button id="colorPickerNoneBtn" class="color-swatch-circle none-color-swatch" title="بدون لون (شفاف)">
         <span class="none-slash"></span>
       </button>
-      <!-- زر اختيار مخصص مع تدرج لوني دائري كامل -->
       <button id="colorPickerCustomTriggerBtn" class="color-swatch-circle custom-rainbow-swatch" title="لون مخصص...">
         <span class="material-symbols-rounded">colorize</span>
       </button>
@@ -433,7 +522,6 @@
 
     <div class="color-bar-divider"></div>
 
-    <!-- المساحة الأفقية المخصصة للتمرير السلس بالأصبع أو السكرول -->
     <div id="floatingColorScrollArea" class="floating-color-scroll">
       <!-- 10 ألوان الثيم الفاتح -->
       <div class="color-swatch-group" title="ألوان الثيم الفاتح">
@@ -485,7 +573,6 @@
       </div>
     </div>
 
-    <!-- زر إغلاق الشريط -->
     <button id="closeFloatingColorBarBtn" class="icon-btn close-palette-btn" title="إغلاق">
       <span class="material-symbols-rounded">close</span>
     </button>
@@ -542,7 +629,7 @@
     </div>
   </div>
 
-  <!-- شاشة التحميل والتقدم الدائرية -->
+  <!-- شاشة التحميل وشريط التقدم العام -->
   <div id="progressContainer">
     <div class="progress-card">
       <span id="progressTitle" style="font-weight:800; font-size:14px;">جاري المعالجة...</span>
@@ -553,7 +640,7 @@
     </div>
   </div>
 
-  <!-- تشغيل السكريبت الرئيسي كـ ES Module -->
+  <!-- تشغيل السكريبت كـ ES Module -->
   <script type="module" src="js/main.js"></script>
 
   <!-- مشغل الخدمة PWA -->
