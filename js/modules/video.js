@@ -22,6 +22,10 @@ export const VideoStudio = {
   maxInput: document.getElementById('videoMaxFramesInput'),
   maxVal: document.getElementById('videoMaxFramesVal'),
 
+  gifBtn: document.getElementById('extractGifBtn'),
+  zipBtn: document.getElementById('extractZipBtn'),
+  transferBtn: document.getElementById('transferVidToCollageBtn'),
+
   init() {
     this.bindEvents();
   },
@@ -40,6 +44,9 @@ export const VideoStudio = {
         this.player.onloadedmetadata = () => {
           this.emptyNotice.style.display = 'none';
           this.wrapper.style.display = 'flex';
+          this.gifBtn.disabled = false;
+          this.zipBtn.disabled = false;
+          this.transferBtn.disabled = false;
 
           this.durationBadge.textContent = `${toEnDigits(this.player.duration.toFixed(1))} ثانية`;
           this.resBadge.textContent = `${toEnDigits(this.player.videoWidth)}x${toEnDigits(this.player.videoHeight)}`;
@@ -57,6 +64,65 @@ export const VideoStudio = {
       this.maxVal.textContent = toEnDigits(e.target.value);
       this.updateEstimated();
     });
+
+    // أزرار التصدير في الشريط العلوي للهيدر
+    this.gifBtn?.addEventListener('click', async () => {
+      const frames = await this.extractFrames();
+      if (!frames.length) return hideProgress();
+
+      showProgress('جاري إنشاء ملف GIF...');
+      const images = frames.map(f => f.toDataURL('image/png'));
+      window.gifshot.createGIF({
+        images,
+        gifWidth: Math.min(frames[0].width, 600),
+        gifHeight: Math.min(frames[0].height, (frames[0].height * (600 / frames[0].width))),
+        interval: 1 / (parseInt(toEnDigits(this.fpsInput.value)) || 10),
+        numWorkers: 4
+      }, (obj) => {
+        if (!obj.error) {
+          const a = document.createElement('a');
+          a.href = obj.image;
+          a.download = 'video_animation.gif';
+          a.click();
+        }
+        hideProgress();
+      });
+    });
+
+    this.zipBtn?.addEventListener('click', async () => {
+      const frames = await this.extractFrames();
+      if (!frames.length) return hideProgress();
+
+      showProgress('جاري ضغط الإطارات...');
+      const zip = new JSZip();
+      const folder = zip.folder('video_frames');
+      frames.forEach((f, idx) => {
+        folder.file(`frame_${String(idx + 1).padStart(4, '0')}.png`, f.toDataURL('image/png').split(',')[1], { base64: true });
+      });
+      const blob = await zip.generateAsync({ type: 'blob' }, (m) => updateProgress(m.percent));
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'video_frames.zip';
+      a.click();
+      hideProgress();
+    });
+
+    this.transferBtn?.addEventListener('click', async () => {
+      const frames = await this.extractFrames();
+      if (!frames.length) return hideProgress();
+
+      const promises = frames.map(f => new Promise(res => {
+        const img = new Image();
+        img.onload = () => res({ img });
+        img.src = f.toDataURL('image/png');
+      }));
+      const imported = await Promise.all(promises);
+      Store.collageImages.push(...imported);
+      hideProgress();
+      document.getElementById('tabCollageBtn')?.click();
+      Collage.updateUI();
+      Collage.render();
+    });
   },
 
   updateEstimated() {
@@ -71,7 +137,7 @@ export const VideoStudio = {
     if (!Store.currentVideoFile) return [];
     const fps = parseInt(toEnDigits(this.fpsInput.value)) || 10;
     const max = parseInt(toEnDigits(this.maxInput.value)) || 80;
-    showProgress('جاري استخراج اللقطات...');
+    showProgress('جاري استخراج الفريمات...');
 
     return new Promise((resolve) => {
       const v = document.createElement('video');
@@ -112,63 +178,5 @@ export const VideoStudio = {
         resolve(extracted);
       };
     });
-  },
-
-  async exportGIF() {
-    const frames = await this.extractFrames();
-    if (!frames.length) return hideProgress();
-
-    showProgress('جاري إنشاء GIF...');
-    const images = frames.map(f => f.toDataURL('image/png'));
-    window.gifshot.createGIF({
-      images,
-      gifWidth: Math.min(frames[0].width, 600),
-      gifHeight: Math.min(frames[0].height, (frames[0].height * (600 / frames[0].width))),
-      interval: 1 / (parseInt(toEnDigits(this.fpsInput.value)) || 10),
-      numWorkers: 4
-    }, (obj) => {
-      if (!obj.error) {
-        const a = document.createElement('a');
-        a.href = obj.image;
-        a.download = 'video_extract.gif';
-        a.click();
-      }
-      hideProgress();
-    });
-  },
-
-  async exportZIP() {
-    const frames = await this.extractFrames();
-    if (!frames.length) return hideProgress();
-
-    showProgress('جاري ضغط الصور...');
-    const zip = new JSZip();
-    const folder = zip.folder('video_frames');
-    frames.forEach((f, idx) => {
-      folder.file(`frame_${String(idx + 1).padStart(4, '0')}.png`, f.toDataURL('image/png').split(',')[1], { base64: true });
-    });
-    const blob = await zip.generateAsync({ type: 'blob' }, (m) => updateProgress(m.percent));
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'video_frames.zip';
-    a.click();
-    hideProgress();
-  },
-
-  async transferFrames() {
-    const frames = await this.extractFrames();
-    if (!frames.length) return hideProgress();
-
-    const promises = frames.map(f => new Promise(res => {
-      const img = new Image();
-      img.onload = () => res({ img });
-      img.src = f.toDataURL('image/png');
-    }));
-    const imported = await Promise.all(promises);
-    Store.collageImages.push(...imported);
-    hideProgress();
-    document.getElementById('tabCollageBtn')?.click();
-    Collage.updateUI();
-    Collage.render();
   }
 };
