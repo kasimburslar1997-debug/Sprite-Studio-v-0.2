@@ -1,5 +1,6 @@
 /**
- * Media & Sprite Studio - Collage Studio Module (Exact Ratio & Geometry Engine)
+ * Media & Sprite Studio - Collage Studio Module
+ * Fixed: Aspect Ratio Math, Center-Crop Cover Engine & Dynamic Grid
  */
 import { Store } from '../state.js';
 import { toEnDigits, showProgress, updateProgress, hideProgress } from '../utils.js';
@@ -122,9 +123,10 @@ export const Collage = {
       this.render();
     });
 
+    // فتح وإغلاق قائمة النسب
     this.ratioBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isHidden = this.ratioPopup.style.display === 'none';
+      const isHidden = this.ratioPopup.style.display === 'none' || !this.ratioPopup.style.display;
       this.ratioPopup.style.display = isHidden ? 'flex' : 'none';
     });
 
@@ -134,6 +136,7 @@ export const Collage = {
       }
     });
 
+    // تبديل وتطبيق النسبة
     document.querySelectorAll('.ratio-option-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.ratio-option-btn').forEach(b => b.classList.remove('active'));
@@ -162,7 +165,7 @@ export const Collage = {
         }
 
         this.ratioPopup.style.display = 'none';
-        this.render();
+        this.render(); // إعادة الرسم الفوري بالنسبة الجديدة
       });
     });
 
@@ -235,15 +238,20 @@ export const Collage = {
     if (this.counterNum) this.counterNum.textContent = toEnDigits(Store.collageImages.length);
   },
 
-  // المحرك الهندسي لحساب النسب الحقيقية بدقة تامة
+  // المحرك الهندسي المصحح بالكامل
   render() {
     if (!Store.collageImages.length) {
       if (this.ctx) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       return;
     }
 
+    const totalImages = Store.collageImages.length;
     const imgSize = parseInt(toEnDigits(this.sizeNum?.value)) || 128;
-    const columns = Math.max(1, parseInt(toEnDigits(this.colsNum?.value)) || 1);
+    const requestedCols = Math.max(1, parseInt(toEnDigits(this.colsNum?.value)) || 1);
+    
+    // تصحيح الأعمدة: إذا كانت الصور أقل من الأعمدة، لا ننشئ فراغات فارغة
+    const columns = Math.min(requestedCols, totalImages);
+    
     const gap = parseInt(toEnDigits(this.gapInput?.value)) || 0;
     const strokeWidth = parseInt(toEnDigits(this.strokeInput?.value)) || 0;
     const strokeColor = this.strokeColor?.value || Store.collageStrokeColor || '#FF3B5C';
@@ -254,18 +262,20 @@ export const Collage = {
     let totalWidth = 0;
     let totalHeight = 0;
 
+    // هامش نصف الإطار لمنع اقتطاعه من حدود الكانفاس
     const strokePad = Math.ceil(strokeWidth / 2);
 
     if (isFixedRatio) {
-      // حساب الأبعاد الحقيقية للخلايا بناءً على النسبة المستهدفة W : H
+      // 1. حساب النسبة المستهدفة W : H
       const targetAspect = Store.collageRatioW / Store.collageRatioH;
       const cellW = imgSize;
-      const cellH = Math.round(cellW / targetAspect);
+      const cellH = Math.round(cellW / targetAspect); // الارتفاع يتحدد بالمليمتر حسب النسبة
+      
       const totalCols = columns;
-      const totalRows = Math.ceil(Store.collageImages.length / totalCols);
+      const totalRows = Math.ceil(totalImages / totalCols);
 
-      totalWidth = totalCols * cellW + (totalCols - 1) * gap + strokeWidth * 2;
-      totalHeight = totalRows * cellH + (totalRows - 1) * gap + strokeWidth * 2;
+      totalWidth = strokePad * 2 + totalCols * cellW + (totalCols - 1) * gap;
+      totalHeight = strokePad * 2 + totalRows * cellH + (totalRows - 1) * gap;
 
       positions = Store.collageImages.map((item, i) => {
         const col = i % totalCols;
@@ -278,34 +288,50 @@ export const Collage = {
         const imgH = item.img.naturalHeight || item.img.height || cellH;
         const imgAspect = imgW / imgH;
 
-        // احتواء الصورة داخل الخلية مع الحفاظ الكامل على دقتها وأبعادها الأصلية
-        let drawW, drawH;
+        // خوارزمية القص والتوسيط الذكي (Object-Fit: Cover)
+        // هذا هو السر الذي يجعل كل صورة تأخذ النسبة المطلوبة فوراً
+        let sX = 0, sY = 0, sW = imgW, sH = imgH;
         if (imgAspect > targetAspect) {
-          drawW = cellW;
-          drawH = cellW / imgAspect;
+          // الصورة أعرض من المطلوب -> يتم قص الجانبين بالتساوي
+          sW = imgH * targetAspect;
+          sX = (imgW - sW) / 2;
         } else {
-          drawH = cellH;
-          drawW = cellH * imgAspect;
+          // الصورة أطول من المطلوب -> يتم قص الأعلى والأسفل بالتساوي
+          sH = imgW / targetAspect;
+          sY = (imgH - sH) / 2;
         }
 
-        const drawX = cellX + (cellW - drawW) / 2;
-        const drawY = cellY + (cellH - drawH) / 2;
-
-        return { x: cellX, y: cellY, w: cellW, h: cellH, drawX, drawY, drawW, drawH };
+        return {
+          x: cellX, y: cellY, w: cellW, h: cellH,
+          sX, sY, sW, sH,
+          drawX: cellX, drawY: cellY, drawW: cellW, drawH: cellH
+        };
       });
     } else {
-      // الحساب الحر التلقائي للأعمدة المتتالية
+      // النمط الحر (Auto): الحفاظ على الارتفاع الأصلي لكل صورة
       const cellWidth = imgSize;
-      const cellHeights = Store.collageImages.map(o => (cellWidth / (o.img.naturalWidth || o.img.width)) * (o.img.naturalHeight || o.img.height));
-      const colYs = Array(columns).fill(strokePad);
-      positions = Array(Store.collageImages.length);
+      const cellHeights = Store.collageImages.map(o => {
+        const nw = o.img.naturalWidth || o.img.width || cellWidth;
+        const nh = o.img.naturalHeight || o.img.height || cellWidth;
+        return Math.round((cellWidth / nw) * nh);
+      });
 
-      for (let i = 0; i < Store.collageImages.length; i++) {
+      const colYs = Array(columns).fill(strokePad);
+      positions = Array(totalImages);
+
+      for (let i = 0; i < totalImages; i++) {
         const col = i % columns;
         const x = strokePad + col * (cellWidth + gap);
         const y = colYs[col];
         const h = cellHeights[i];
-        positions[i] = { x, y, w: cellWidth, h, drawX: x, drawY: y, drawW: cellWidth, drawH: h };
+        
+        positions[i] = {
+          x, y, w: cellWidth, h,
+          sX: 0, sY: 0,
+          sW: Store.collageImages[i].img.naturalWidth || cellWidth,
+          sH: Store.collageImages[i].img.naturalHeight || h,
+          drawX: x, drawY: y, drawW: cellWidth, drawH: h
+        };
         colYs[col] += h + gap;
       }
 
@@ -318,7 +344,7 @@ export const Collage = {
     this.canvas.width = Math.max(10, Math.round(totalWidth));
     this.canvas.height = Math.max(10, Math.round(totalHeight));
 
-    // رسم الخلفية
+    // رسم الخلفية (لون صافٍ أو شفافة تماماً)
     if (bgColor === 'transparent') {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     } else {
@@ -326,17 +352,29 @@ export const Collage = {
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    // رسم الصور والحدود
+    // رسم الصور بالإسقاط الهندسي الصحيح
     Store.collageImages.forEach((item, index) => {
       const pos = positions[index];
-      this.ctx.drawImage(item.img, pos.drawX, pos.drawY, pos.drawW, pos.drawH);
+      
+      if (isFixedRatio) {
+        // رسم الجزء المقصوص بدقة ليطابق النسبة (1:1، 16:9، إلخ)
+        this.ctx.drawImage(
+          item.img,
+          pos.sX, pos.sY, pos.sW, pos.sH,
+          pos.drawX, pos.drawY, pos.drawW, pos.drawH
+        );
+      } else {
+        this.ctx.drawImage(item.img, pos.drawX, pos.drawY, pos.drawW, pos.drawH);
+      }
 
+      // رسم الحد الخارجي للخلية
       if (strokeWidth > 0) {
         this.ctx.lineWidth = strokeWidth;
         this.ctx.strokeStyle = strokeColor;
         this.ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
       }
 
+      // رسم طبقة التحديد عند تفعيل وضع التحديد
       if (Store.isCollageSelectMode && Store.selectedCollageIndices.has(index)) {
         this.ctx.fillStyle = 'rgba(255, 59, 92, 0.4)';
         this.ctx.fillRect(pos.x, pos.y, pos.w, pos.h);
