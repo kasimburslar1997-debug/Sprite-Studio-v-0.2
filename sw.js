@@ -1,10 +1,5 @@
-/**
- * Media & Sprite Studio - Service Worker (PWA Offline Engine)
- * Cache Version: v5
- */
-
-// اسم الكاش المحدث لتفعيل الملفات والوحدات الجديدة فوراً
-const CACHE_NAME = 'studio-pwa-v5';
+// اسم الكاش الخاص بالتطبيق (تمت الترقية إلى v4 لتخزين المكتبات المحدثة وحذف الروابط التالفة فوراً)
+const CACHE_NAME = 'studio-pwa-v4';
 
 // قائمة الملفات والمكتبات والخطوط المطلوب تخزينها للعمل بدون إنترنت
 const ASSETS_TO_CACHE = [
@@ -18,18 +13,16 @@ const ASSETS_TO_CACHE = [
   './css/studios.css',
   './css/responsive.css',
 
-  // ملفات الـ JavaScript الأساسية والوحدات (Modules)
+  // ملفات الـ JavaScript المقسمة
   './js/main.js',
   './js/state.js',
   './js/utils.js',
   './js/shell.js',
-  './js/modules/color-palette.js',
   './js/modules/collage.js',
   './js/modules/sprite.js',
   './js/modules/pivot.js',
   './js/modules/video.js',
   './js/modules/rename.js',
-  './js/modules/cropStudio.js',
 
   // الخطوط والأيقونات الخارجية
   'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700;800&family=Tajawal:wght@500;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500..700,0..1,0&display=swap',
@@ -37,8 +30,7 @@ const ASSETS_TO_CACHE = [
   // المكتبات الخارجية
   'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-  'https://cdn.jsdelivr.net/npm/gifshot@0.4.5/build/gifshot.min.js',
-  'https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/dist/gifuct.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.4.5/gifshot.min.js'
 ];
 
 // مرحلة التثبيت: حفظ الملفات في الكاش
@@ -50,7 +42,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// مرحلة التفعيل: حذف أي كاش قديم (لتحديث التطبيق تلقائياً)
+// مرحلة التفعيل: حذف أي كاش قديم (مثل v1 أو v2 أو v3) لتحديث التطبيق فوراً
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
