@@ -14,100 +14,28 @@
   <meta name="apple-mobile-web-app-title" content="SpriteStudio">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- الخطوط وأيقونات Google Symbols -->
+  <!-- الخطوط وأيقونات جوجل -->
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700;800&family=Tajawal:wght@500;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500..700,0..1,0&display=swap">
 
-  <!-- ملفات التنسيق المقسمة -->
+  <!-- ملفات التنسيق المقسمة (CSS Modules) -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/studios.css">
   <link rel="stylesheet" href="css/responsive.css">
 
-  <!-- مكتبات المعالجة الخارجية (ZIP / PDF / GIF / Video / GIF Parser) -->
+  <!-- مكتبات المعالجة والتصدير (ZIP / PDF / GIF) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/build/gifshot.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gifuct-js@2.1.2/dist/gifuct.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.4.5/gifshot.min.js"></script>
 </head>
 
 <body>
 
   <div class="app-container">
-    <!-- الشريط العلوي الذكي الموزع -->
+    <!-- الشريط العلوي والتنقل -->
     <header class="app-header">
-      
-      <!-- أزرار التصدير والإجراءات بحسب القسم النشط (الجهة اليمنى في RTL) -->
-      <div class="header-group header-actions-group" id="headerDynamicActions">
-        
-        <!-- 1. أزرار التجميع -->
-        <div id="collageHeaderActions" class="tab-header-actions active-actions">
-          <button id="exportPNGBtn" class="pill-btn header-pill-btn"><span
-              class="material-symbols-rounded red-icon">image</span> PNG</button>
-          <button id="exportPDFBtn" class="pill-btn header-pill-btn"><span
-              class="material-symbols-rounded red-icon">picture_as_pdf</span> PDF</button>
-        </div>
-
-        <!-- 2. أزرار السبرايت -->
-        <div id="spriteHeaderActions" class="tab-header-actions">
-          <button id="openPivotEditorBtn" class="pill-btn header-pill-btn highlight-tool-btn" title="نقطة الارتكاز" disabled><span
-              class="material-symbols-rounded">adjust</span> الارتكاز</button>
-          <button id="exportSpriteMp4Btn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded">videocam</span> MP4</button>
-          <button id="exportSpriteGifBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded">gif</span> GIF</button>
-          <button id="exportZipBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded">folder_zip</span> ZIP</button>
-          <button id="transferToCollageBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded red-icon">move_down</span> للتجميع</button>
-        </div>
-
-        <!-- 3. أزرار استخراج الفيديو -->
-        <div id="videoHeaderActions" class="tab-header-actions">
-          <button id="extractGifBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded">gif</span> تصدير GIF</button>
-          <button id="extractZipBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded">folder_zip</span> إطارات ZIP</button>
-          <button id="transferVidToCollageBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded red-icon">move_down</span> للتجميع</button>
-        </div>
-
-        <!-- 4. أزرار إعادة التسمية -->
-        <div id="renameHeaderActions" class="tab-header-actions">
-          <button id="renameApplyBtn" class="pill-btn header-pill-btn primary-action" disabled><span
-              class="material-symbols-rounded">check</span> تطبيق التسمية</button>
-          <button id="renameExportZipBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded red-icon">download</span> تحميل ZIP</button>
-        </div>
-
-        <!-- 5. أزرار استوديو القص والتحريك الجديد -->
-        <div id="cropHeaderActions" class="tab-header-actions">
-          <button id="undoCropBtn" class="pill-btn header-pill-btn" title="تراجع عن آخر قص" disabled><span
-              class="material-symbols-rounded">undo</span> تراجع</button>
-          <button id="exportCropPngBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded red-icon">folder_zip</span> إطارات ZIP</button>
-          <button id="exportCropGifBtn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded red-icon">gif</span> GIF</button>
-          <button id="exportCropMp4Btn" class="pill-btn header-pill-btn" disabled><span
-              class="material-symbols-rounded red-icon">videocam</span> MP4</button>
-        </div>
-
-      </div>
-
-      <!-- الوسط: أزرار التبويبات الخمسة -->
-      <nav class="tabs-container">
-        <button id="tabCollageBtn" class="tab-btn active"><span class="material-symbols-rounded">grid_view</span>
-          التجميع</button>
-        <button id="tabSpriteBtn" class="tab-btn"><span class="material-symbols-rounded">animation</span>
-          السبرايت</button>
-        <button id="tabVideoBtn" class="tab-btn"><span class="material-symbols-rounded">movie</span> الفيديو</button>
-        <button id="tabRenameBtn" class="tab-btn"><span class="material-symbols-rounded">edit_note</span> إعادة
-          التسمية</button>
-        <button id="tabCropBtn" class="tab-btn"><span class="material-symbols-rounded">crop</span> القص والتحريك</button>
-      </nav>
-
-      <!-- أزرار التحكم بالثيم وملء الشاشة (الجهة اليسرى في RTL) -->
-      <div class="header-group header-controls-group">
+      <div class="header-group">
         <button id="themeToggleBtn" class="icon-btn" title="تغيير المظهر">
           <span id="themeIcon" class="material-symbols-rounded">dark_mode</span>
         </button>
@@ -116,6 +44,22 @@
         </button>
       </div>
 
+      <nav class="tabs-container">
+        <button id="tabCollageBtn" class="tab-btn active"><span class="material-symbols-rounded">grid_view</span>
+          التجميع</button>
+        <button id="tabSpriteBtn" class="tab-btn"><span class="material-symbols-rounded">animation</span>
+          السبرايت</button>
+        <button id="tabVideoBtn" class="tab-btn"><span class="material-symbols-rounded">movie</span> الفيديو</button>
+        <button id="tabRenameBtn" class="tab-btn"><span class="material-symbols-rounded">edit_note</span> إعادة
+          التسمية</button>
+      </nav>
+
+      <div class="header-group" id="headerExportGroup">
+        <button id="exportPNGBtn" class="pill-btn header-pill-btn"><span
+            class="material-symbols-rounded red-icon">image</span> PNG</button>
+        <button id="exportPDFBtn" class="pill-btn header-pill-btn"><span
+            class="material-symbols-rounded red-icon">picture_as_pdf</span> PDF</button>
+      </div>
     </header>
 
     <!-- 1. استوديو التجميع (Collage Studio) -->
@@ -125,14 +69,14 @@
           <div id="emptyNotice" class="empty-placeholder">
             <div class="upload-circle"><span class="material-symbols-rounded upload-symbol">add_photo_alternate</span>
             </div>
-            <span>انقر أو اسحب الصور هنا للبدء بالتجميع</span>
+            <span>انقر أو اسحب الصور هنا للبدء</span>
           </div>
           <canvas id="previewCanvas"></canvas>
           <input type="file" id="imgUpload" multiple accept="image/*" style="display:none">
         </div>
       </div>
 
-      <div class="bottom-bar scrollable-bar">
+      <div class="bottom-bar">
         <button id="collageImportActionBtn" class="pill-btn import-btn"><span
             class="material-symbols-rounded">add</span> إضافة صور</button>
         <div class="divider"></div>
@@ -157,6 +101,7 @@
           </div>
         </div>
 
+        <!-- زر وقائمة النسب -->
         <div class="ratio-picker-container">
           <button id="collageRatioBtn" class="pill-btn ratio-btn">
             <span id="ratioBtnPreview" class="ratio-btn-preview"><span class="ratio-box-icon r-1-1"></span></span>
@@ -176,7 +121,7 @@
               <button class="ratio-option-btn" data-ratio="9:16" data-w="9" data-h="16"><span
                   class="ratio-box-icon r-9-16"></span> 9:16</button>
               <button class="ratio-option-btn" data-ratio="auto"><span
-                  class="material-symbols-rounded red-icon">crop_free</span> حر/أصلي</button>
+                  class="material-symbols-rounded red-icon">crop_free</span> تلقائي</button>
             </div>
           </div>
         </div>
@@ -191,21 +136,21 @@
           <span class="label-text">الحد</span>
           <input type="range" id="strokeWidth" class="custom-slider" min="0" max="20" value="0">
           <span id="strokeWidthVal" class="value-badge">0px</span>
-          <div class="custom-color-circle-btn" id="strokeColorCircleBtn" data-target="strokeColor" style="background-color: #FF3B5C;" title="لون الإطار"></div>
-          <input type="color" id="strokeColor" class="hidden-native-color" value="#FF3B5C">
+          <div class="color-picker-wrapper"><input type="color" id="strokeColor" class="color-picker-input"
+              value="#FF3B5C"></div>
         </div>
 
         <div class="control-group">
           <span class="label-text">الخلفية</span>
-          <div class="custom-color-circle-btn" id="collageBgColorCircleBtn" data-target="collageBgColor" style="background-color: #FFFFFF;" title="لون الخلفية"></div>
-          <input type="color" id="collageBgColor" class="hidden-native-color" value="#FFFFFF">
+          <div class="color-picker-wrapper"><input type="color" id="collageBgColor" class="color-picker-input"
+              value="#FFFFFF"></div>
         </div>
 
         <button id="collageSelectModeBtn" class="pill-btn"><span
             class="material-symbols-rounded red-icon">checklist</span> تحديد</button>
 
         <div id="collageSelectActions" style="display:none; gap:6px;">
-          <span id="collageSelectCountBadge" class="edit-hint-badge">تم تحديد 0</span>
+          <span id="collageSelectCountBadge" class="edit-hint-badge">تم تحديد 0 صور</span>
           <button id="collageDeleteSelectedBtn" class="pill-btn cancel-btn"><span
               class="material-symbols-rounded">delete</span> حذف</button>
           <button id="collageCancelSelectBtn" class="pill-btn">إلغاء</button>
@@ -249,10 +194,23 @@
               <input type="range" id="fpsInput" class="custom-slider" min="1" max="60" value="12">
             </div>
           </div>
+
+          <div class="sprite-actions-bar">
+            <button id="openPivotEditorBtn" class="icon-btn action-tool-btn highlight-tool-btn" title="نقطة الارتكاز"
+              disabled><span class="material-symbols-rounded">adjust</span></button>
+            <button id="exportSpriteMp4Btn" class="icon-btn action-tool-btn" title="تصدير MP4" disabled><span
+                class="material-symbols-rounded">videocam</span></button>
+            <button id="exportSpriteGifBtn" class="icon-btn action-tool-btn" title="تصدير GIF" disabled><span
+                class="material-symbols-rounded">gif</span></button>
+            <button id="exportZipBtn" class="icon-btn action-tool-btn" title="تصدير ZIP" disabled><span
+                class="material-symbols-rounded">folder_zip</span></button>
+            <button id="transferToCollageBtn" class="icon-btn action-tool-btn" title="نقل إلى التجميع" disabled><span
+                class="material-symbols-rounded">move_down</span></button>
+          </div>
         </div>
       </div>
 
-      <div class="bottom-bar scrollable-bar">
+      <div class="bottom-bar">
         <button id="spriteImportActionBtn" class="pill-btn import-btn"><span class="material-symbols-rounded">add</span>
           استيراد سبرايت</button>
         <div class="divider"></div>
@@ -281,8 +239,8 @@
 
         <div class="control-group">
           <span class="label-text">الخلفية</span>
-          <div class="custom-color-circle-btn" id="spriteBgColorCircleBtn" data-target="spriteBgColor" style="background-color: #FFFFFF;" title="لون الخلفية"></div>
-          <input type="color" id="spriteBgColor" class="hidden-native-color" value="#FFFFFF">
+          <div class="color-picker-wrapper"><input type="color" id="spriteBgColor" class="color-picker-input"
+              value="#FFFFFF"></div>
         </div>
 
         <button id="editSpriteOrderBtn" class="pill-btn" disabled><span
@@ -295,7 +253,7 @@
         <button id="spriteSelectDeleteBtn" class="pill-btn delete-mode-btn" disabled><span
             class="material-symbols-rounded">delete</span> حذف فريمات</button>
         <div id="spriteDeleteActions" style="display:none; gap:6px;">
-          <span id="spriteDeleteCountBadge" class="edit-hint-badge">تم تحديد 0</span>
+          <span id="spriteDeleteCountBadge" class="edit-hint-badge">تم تحديد 0 فريم</span>
           <button id="confirmSpriteDeleteBtn" class="pill-btn cancel-btn">حذف</button>
           <button id="cancelSpriteDeleteBtn" class="pill-btn">إلغاء</button>
         </div>
@@ -326,15 +284,19 @@
               <div class="info-item"><span>الدقة:</span><b id="vidResBadge">0x0</b></div>
               <div class="info-item"><span>الفريمات التقديرية:</span><b id="vidEstFramesBadge">0 فريم</b></div>
             </div>
-            <div class="video-notice-box">
-              <span class="material-symbols-rounded red-icon">info</span>
-              <span>يمكنك تصدير المشهد من الأزرار العلوية للشاشة بمجرد جاهزية الفيديو.</span>
+            <div class="action-buttons-group" style="width:100%;">
+              <button id="extractGifBtn" class="pill-btn primary-action" disabled><span
+                  class="material-symbols-rounded">gif</span> تصدير GIF</button>
+              <button id="extractZipBtn" class="pill-btn secondary-action" disabled><span
+                  class="material-symbols-rounded">folder_zip</span> تصدير فريمات ZIP</button>
+              <button id="transferVidToCollageBtn" class="pill-btn" disabled><span
+                  class="material-symbols-rounded red-icon">move_down</span> نقل الفريمات للتجميع</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="bottom-bar scrollable-bar">
+      <div class="bottom-bar">
         <button id="videoImportActionBtn" class="pill-btn import-btn"><span class="material-symbols-rounded">add</span>
           اختيار فيديو</button>
         <div class="divider"></div>
@@ -367,8 +329,6 @@
                 <button id="renameSelectAllBtn" class="pill-btn rename-header-btn">تحديد الكل</button>
                 <button id="renameDeselectAllBtn" class="pill-btn rename-header-btn rename-cancel-btn"
                   style="display:none;">إلغاء التحديد</button>
-                <button id="renameClearTopBtn" class="icon-btn broom-btn" title="مسح الصور"><span
-                    class="material-symbols-rounded">cleaning_services</span></button>
               </div>
               <div class="rename-status-info">
                 <span id="renameSelectCountBadge" class="rename-badge-pill highlight-badge">تم تحديد: 0</span>
@@ -384,7 +344,7 @@
         </div>
       </div>
 
-      <div class="bottom-bar scrollable-bar">
+      <div class="bottom-bar">
         <button id="renameImportActionBtn" class="pill-btn import-btn"><span class="material-symbols-rounded">add</span>
           إضافة صور</button>
         <div class="divider"></div>
@@ -427,155 +387,14 @@
           </div>
         </div>
 
+        <button id="renameApplyBtn" class="pill-btn primary-action" disabled><span
+            class="material-symbols-rounded">check</span> تطبيق التسمية</button>
+        <button id="renameExportZipBtn" class="pill-btn" disabled><span
+            class="material-symbols-rounded red-icon">download</span> تحميل ZIP</button>
         <button id="renameClearBtn" class="icon-btn broom-btn" title="مسح الكل" disabled><span
             class="material-symbols-rounded">cleaning_services</span></button>
       </div>
     </section>
-
-    <!-- 5. استوديو القص والتحريك الجديد (Crop & Motion Studio) -->
-    <section id="cropView" class="view-section">
-      <div class="main-workspace full-workspace">
-        <div id="cropDropZone" class="canvas-card crop-canvas-card empty-crop-card">
-          
-          <!-- الرسالة الإرشادية لرفع الملفات -->
-          <div id="cropPlaceholder" class="empty-placeholder">
-            <div class="upload-circle"><span class="material-symbols-rounded upload-symbol">crop</span></div>
-            <span id="cropPlaceholderText">اضغط هنا أو اسحب وأفلت صور PNG أو متحركة GIF أو فيديو</span>
-          </div>
-
-          <!-- مساحة العرض والكانفاس مع طبقة القص التفاعلية -->
-          <div class="crop-stage-box" id="cropStageBox" style="display: none;">
-            <canvas id="cropStage"></canvas>
-            
-            <div class="crop-overlay" id="cropOverlay" style="display: none;">
-              <div class="crop-mask-box"></div>
-              <div class="crop-line horizontal top" id="cropLineTop"></div>
-              <div class="crop-line horizontal bottom" id="cropLineBottom"></div>
-              <div class="crop-line vertical left" id="cropLineLeft"></div>
-              <div class="crop-line vertical right" id="cropLineRight"></div>
-            </div>
-          </div>
-
-          <!-- مدخل الملفات الخفي -->
-          <input type="file" id="cropFileInput" accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm, video/quicktime, .mov" multiple style="display:none">
-        </div>
-      </div>
-
-      <!-- شريط أدوات القص السفلي -->
-      <div class="bottom-bar scrollable-bar">
-        <button id="cropImportBtn" class="pill-btn import-btn"><span class="material-symbols-rounded">add</span>
-          إضافة وسائط</button>
-        <div class="divider"></div>
-
-        <!-- زر تطبيق القص -->
-        <button id="applyCropBtn" class="pill-btn primary-action" disabled>
-          <span class="material-symbols-rounded">crop</span> تطبيق القص
-        </button>
-
-        <!-- زر تراكب كافة الطبقات 100% لتحديد حدود الحركة -->
-        <button id="cropAllLayersBtn" class="pill-btn" title="معاينة كافة الطبقات معاً لتحديد أبعاد القص بدقة" disabled>
-          <span class="material-symbols-rounded red-icon">layers</span> معاينة الكل
-        </button>
-
-        <!-- زر التشغيل / الإيقاف المؤقت -->
-        <button id="cropPlayBtn" class="icon-btn" title="تشغيل / إيقاف" disabled>
-          <span id="cropPlayIcon" class="material-symbols-rounded">play_arrow</span>
-        </button>
-
-        <!-- شريط التمرير الزمني بين الإطارات -->
-        <div class="control-group" style="flex: 1; min-width: 140px;">
-          <input type="range" id="cropTimeline" class="custom-slider" min="0" max="0" value="0" style="width: 100%;" disabled>
-        </div>
-
-        <!-- عداد الإطارات الحالي -->
-        <span id="cropFrameIndicator" class="counter-badge" style="font-family: 'Comfortaa', sans-serif;">0 / 0</span>
-
-        <!-- متحكم السرعة (FPS) -->
-        <div class="control-group">
-          <span class="label-text">السرعة</span>
-          <div class="stepper-widget">
-            <button id="cropSpeedDecBtn" class="stepper-arrow-btn" disabled><span class="material-symbols-rounded">remove</span></button>
-            <input id="cropFpsNum" class="stepper-number-input" type="text" value="12" style="width: 36px;" readonly>
-            <button id="cropSpeedIncBtn" class="stepper-arrow-btn" disabled><span class="material-symbols-rounded">add</span></button>
-          </div>
-        </div>
-
-        <!-- زر المسح والبدء من جديد -->
-        <button id="cropClearBtn" class="icon-btn broom-btn" title="مسح الكل والبدء من جديد" disabled>
-          <span class="material-symbols-rounded">cleaning_services</span>
-        </button>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- الشريط العائم لاختيار الألوان (Universal Floating Color Palette Bar) -->
-  <div id="floatingColorBar" class="floating-color-bar" style="display: none;">
-    <div class="floating-color-sticky-tools">
-      <button id="colorPickerNoneBtn" class="color-swatch-circle none-color-swatch" title="بدون لون (شفاف)">
-        <span class="none-slash"></span>
-      </button>
-      <button id="colorPickerCustomTriggerBtn" class="color-swatch-circle custom-rainbow-swatch" title="لون مخصص...">
-        <span class="material-symbols-rounded">colorize</span>
-      </button>
-    </div>
-
-    <div class="color-bar-divider"></div>
-
-    <div id="floatingColorScrollArea" class="floating-color-scroll">
-      <!-- 10 ألوان الثيم الفاتح -->
-      <div class="color-swatch-group" title="ألوان الثيم الفاتح">
-        <span class="swatch-group-label">نهاري</span>
-        <div class="color-swatch-circle" data-color="#FFFFFF" style="background-color: #FFFFFF;"></div>
-        <div class="color-swatch-circle" data-color="#FFF0F3" style="background-color: #FFF0F3;"></div>
-        <div class="color-swatch-circle" data-color="#FFE3E8" style="background-color: #FFE3E8;"></div>
-        <div class="color-swatch-circle" data-color="#FFD166" style="background-color: #FFD166;"></div>
-        <div class="color-swatch-circle" data-color="#06D6A0" style="background-color: #06D6A0;"></div>
-        <div class="color-swatch-circle" data-color="#118AB2" style="background-color: #118AB2;"></div>
-        <div class="color-swatch-circle" data-color="#70C1B3" style="background-color: #70C1B3;"></div>
-        <div class="color-swatch-circle" data-color="#E2E3E5" style="background-color: #E2E3E5;"></div>
-        <div class="color-swatch-circle" data-color="#F3E8FF" style="background-color: #F3E8FF;"></div>
-        <div class="color-swatch-circle" data-color="#FFD6BA" style="background-color: #FFD6BA;"></div>
-      </div>
-
-      <div class="color-bar-divider"></div>
-
-      <!-- 10 ألوان الثيم الداكن -->
-      <div class="color-swatch-group" title="ألوان الثيم الداكن">
-        <span class="swatch-group-label">داكن</span>
-        <div class="color-swatch-circle" data-color="#141619" style="background-color: #141619;"></div>
-        <div class="color-swatch-circle" data-color="#1F2227" style="background-color: #1F2227;"></div>
-        <div class="color-swatch-circle" data-color="#2B2D42" style="background-color: #2B2D42;"></div>
-        <div class="color-swatch-circle" data-color="#331D24" style="background-color: #331D24;"></div>
-        <div class="color-swatch-circle" data-color="#FF3B5C" style="background-color: #FF3B5C;"></div>
-        <div class="color-swatch-circle" data-color="#D90429" style="background-color: #D90429;"></div>
-        <div class="color-swatch-circle" data-color="#073B4C" style="background-color: #073B4C;"></div>
-        <div class="color-swatch-circle" data-color="#1B4965" style="background-color: #1B4965;"></div>
-        <div class="color-swatch-circle" data-color="#2D3142" style="background-color: #2D3142;"></div>
-        <div class="color-swatch-circle" data-color="#4F5D75" style="background-color: #4F5D75;"></div>
-      </div>
-
-      <div class="color-bar-divider"></div>
-
-      <!-- 10 تدرجات رمادية من الأبيض للأسود -->
-      <div class="color-swatch-group" title="التدرجات الرمادية">
-        <span class="swatch-group-label">رمادي</span>
-        <div class="color-swatch-circle" data-color="#FFFFFF" style="background-color: #FFFFFF;"></div>
-        <div class="color-swatch-circle" data-color="#E5E5E5" style="background-color: #E5E5E5;"></div>
-        <div class="color-swatch-circle" data-color="#CCCCCC" style="background-color: #CCCCCC;"></div>
-        <div class="color-swatch-circle" data-color="#B3B3B3" style="background-color: #B3B3B3;"></div>
-        <div class="color-swatch-circle" data-color="#999999" style="background-color: #999999;"></div>
-        <div class="color-swatch-circle" data-color="#808080" style="background-color: #808080;"></div>
-        <div class="color-swatch-circle" data-color="#666666" style="background-color: #666666;"></div>
-        <div class="color-swatch-circle" data-color="#4D4D4D" style="background-color: #4D4D4D;"></div>
-        <div class="color-swatch-circle" data-color="#333333" style="background-color: #333333;"></div>
-        <div class="color-swatch-circle" data-color="#000000" style="background-color: #000000;"></div>
-      </div>
-    </div>
-
-    <button id="closeFloatingColorBarBtn" class="icon-btn close-palette-btn" title="إغلاق">
-      <span class="material-symbols-rounded">close</span>
-    </button>
   </div>
 
   <!-- نافذة محرر نقطة الارتكاز (Pivot Editor Modal) -->
@@ -629,7 +448,7 @@
     </div>
   </div>
 
-  <!-- شاشة التحميل وشريط التقدم العام -->
+  <!-- شاشة التحميل والتقدم الدائرية -->
   <div id="progressContainer">
     <div class="progress-card">
       <span id="progressTitle" style="font-weight:800; font-size:14px;">جاري المعالجة...</span>
@@ -640,19 +459,19 @@
     </div>
   </div>
 
-  <!-- تشغيل السكريبت كـ ES Module -->
+  <!-- تشغيل السكريبت الرئيسي كـ ES Module -->
   <script type="module" src="js/main.js"></script>
 
-  <!-- مشغل الخدمة PWA -->
+  <!-- تسجيل Service Worker لـ PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
           .then((registration) => {
-            console.log('Service Worker مسجل بنجاح، النطاق:', registration.scope);
+            console.log('تم تفعيل Service Worker بنجاح، نطاق العمل:', registration.scope);
           })
           .catch((error) => {
-            console.error('فشل تسجيل Service Worker:', error);
+            console.error('فشل في تسجيل Service Worker:', error);
           });
       });
     }
